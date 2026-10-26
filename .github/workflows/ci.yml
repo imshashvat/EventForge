@@ -1,0 +1,148 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: "22"
+
+jobs:
+  # ── 1. Lint + TypeCheck ─────────────────────────────────────────────────────
+  lint:
+    name: Lint & TypeCheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+
+  # ── 2. Unit Tests ───────────────────────────────────────────────────────────
+  unit:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - run: npm test
+        env:
+          # Unit tests must not need any real env vars
+          APP_ENV: local
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+          NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: anon-key-placeholder
+          SUPABASE_SERVICE_ROLE_KEY: service-role-placeholder
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/eventforge
+          DATABASE_READONLY_URL: postgresql://postgres:postgres@localhost:5432/eventforge
+          UPSTASH_REDIS_REST_URL: http://localhost:8079
+          UPSTASH_REDIS_REST_TOKEN: placeholder
+          SMTP_HOST: localhost
+          SMTP_PORT: "587"
+          SMTP_USER: test
+          SMTP_PASS: test
+          EMAIL_FROM: test@example.com
+          CRON_SECRET: "00000000000000000000000000000000"
+          LOG_LEVEL: error
+
+  # ── 3. Integration Tests ────────────────────────────────────────────────────
+  integration:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: supabase/postgres:15.6.1.139
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: eventforge_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - name: Run migrations
+        run: npm run db:migrate
+        env:
+          DATABASE_MIGRATE_URL: postgresql://postgres:postgres@localhost:5432/eventforge_test
+      - name: Run integration tests
+        run: npx vitest run --config vitest.integration.config.ts
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/eventforge_test
+          DATABASE_READONLY_URL: postgresql://postgres:postgres@localhost:5432/eventforge_test
+          APP_ENV: local
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+          NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: anon-key
+          SUPABASE_SERVICE_ROLE_KEY: service-role
+          UPSTASH_REDIS_REST_URL: http://localhost:8079
+          UPSTASH_REDIS_REST_TOKEN: placeholder
+          SMTP_HOST: localhost
+          SMTP_PORT: "587"
+          SMTP_USER: test
+          SMTP_PASS: test
+          EMAIL_FROM: test@example.com
+          CRON_SECRET: "00000000000000000000000000000000"
+          LOG_LEVEL: error
+          RATE_LIMIT_ENABLED: "false"
+
+  # ── 4. Build ─────────────────────────────────────────────────────────────────
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [lint, unit]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+        env:
+          APP_ENV: preview
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+          NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: anon-key-placeholder
+          SUPABASE_SERVICE_ROLE_KEY: service-role-placeholder
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/eventforge
+          DATABASE_READONLY_URL: postgresql://postgres:postgres@localhost:5432/eventforge
+          UPSTASH_REDIS_REST_URL: http://localhost:8079
+          UPSTASH_REDIS_REST_TOKEN: placeholder
+          SMTP_HOST: localhost
+          SMTP_PORT: "587"
+          SMTP_USER: test
+          SMTP_PASS: test
+          EMAIL_FROM: test@example.com
+          CRON_SECRET: "00000000000000000000000000000000"
+          LOG_LEVEL: error
+
+  # ── 5. Secret Scan ───────────────────────────────────────────────────────────
+  secret-scan:
+    name: Secret Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: trufflesecurity/trufflehog@main
+        with:
+          extra_args: --only-verified

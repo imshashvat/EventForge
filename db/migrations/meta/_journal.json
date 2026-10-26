@@ -1,0 +1,20 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1791018532860,
+      "tag": "0000_add_registration_form_fields",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791906760225,
+      "tag": "0001_warm_bullseye",
+      "breakpoints": true
+    }
+  ]
+}

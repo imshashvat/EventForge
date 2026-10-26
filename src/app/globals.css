@@ -1,0 +1,505 @@
+/* ============================================================
+   EventForge — Global Design Tokens + Base CSS
+   Tailwind CSS v4: @import "tailwindcss" + @theme inline.
+
+   UI Master Guide decisions (locked):
+     D1  Palette: monochrome surfaces + teal (#14b8a6 dark / #0f766e light)
+         accent, amber (#f59e0b / #b45309) reserved ONLY for LIVE states.
+     D3  Giant uppercase display: landing only. App pages use 6-size scale.
+     D4  Serif: system Georgia (headings/display).
+     D5  Rollout: route-group by route-group.
+   Radius:   0 everywhere (avatars/dots may keep rounded-full).
+   Shadows:  none (one exception — hero scrim, landing only).
+   Gradients: none (hero scrim only).
+   ============================================================ */
+
+@import "tailwindcss";
+
+/* ── Geist (body) + JetBrains Mono injected via layout.tsx next/font ── */
+
+/* ============================================================
+   1. BASE TOKENS — dark mode is default
+   ============================================================ */
+:root {
+  /* Surfaces */
+  --bg:          #1a1919;
+  --surface:     #232221;
+  --wash:        #302e2b;
+
+  /* Text */
+  --text:        #f4f3ef;
+  --text-muted:  #bdbab6;
+
+  /* Borders */
+  --border:      #514e4b;
+
+  /* Actions */
+  --action:      #efeee9;   /* button fill (dark) */
+  --on-action:   #1a1919;   /* text on action button */
+  --link:        #efeee9;
+
+  /* Brand / accent */
+  --brand:       #14b8a6;   /* teal-500: interactive (focus, active nav, progress) */
+  --accent:      #14b8a6;
+  --focus:       #14b8a6;
+
+  /* LIVE / urgent — amber, ONLY for open rounds, timers, leaderboard pulse */
+  --live:        #f59e0b;
+
+  /* Status */
+  --success:     #16a34a;
+  --danger:      #dc2626;
+  --good:        #86efac;
+  --bad:         #fca5a5;
+
+  /* Shadows — explicitly none (the UI guide mandates no shadows) */
+  --shadow:      none;
+
+  /* Answer states (quiz — green/red only after results reveal, BR-07) */
+  --answer-selected-bg:     #1f2d2b;
+  --answer-selected-border: #14b8a6;
+  --answer-correct-bg:      #0d2e1a;
+  --answer-correct-border:  #16a34a;
+  --answer-wrong-bg:        #2e1212;
+  --answer-wrong-border:    #dc2626;
+
+  /* Motion */
+  --duration-fast: 150ms;
+  --duration-base: 200ms;
+  --duration-slow: 300ms;
+  --ease-ui: cubic-bezier(.2, 0, 0, 1);
+
+  /* Podium */
+  --gold:   #ffd166;
+  --silver: #c9d1d9;
+  --bronze: #e0a458;
+
+  color-scheme: dark;
+}
+
+/* ============================================================
+   2. LIGHT MODE
+   ============================================================ */
+:root[data-theme="light"] {
+  --bg:          #efeee9;
+  --surface:     #f8f7f3;
+  --wash:        #ded9cf;
+
+  --text:        #1a1919;
+  --text-muted:  #625e58;
+
+  --border:      #c4beb4;
+
+  --action:      #1a1919;
+  --on-action:   #ffffff;
+  --link:        #38332c;
+
+  --brand:       #0f766e;   /* teal-700 on cream — sufficient contrast */
+  --accent:      #0f766e;
+  --focus:       #0f766e;
+
+  --live:        #b45309;   /* amber-700 on cream */
+
+  --good:        #166534;
+  --bad:         #b91c1c;
+
+  --answer-selected-bg:     #eaf9f7;
+  --answer-selected-border: #0f766e;
+  --answer-correct-bg:      #edfbf4;
+  --answer-correct-border:  #16a34a;
+  --answer-wrong-bg:        #fef2f2;
+  --answer-wrong-border:    #dc2626;
+
+  color-scheme: light;
+}
+
+/* ============================================================
+   3. TAILWIND v4 @theme — map tokens into utility classes
+   ============================================================ */
+@theme inline {
+  /* Colours */
+  --color-bg:         var(--bg);
+  --color-surface:    var(--surface);
+  --color-wash:       var(--wash);
+  --color-fg:         var(--text);
+  --color-muted:      var(--text-muted);
+  --color-line:       var(--border);
+  --color-action:     var(--action);
+  --color-on-action:  var(--on-action);
+  --color-brand:      var(--brand);
+  --color-accent:     var(--accent);
+  --color-live:       var(--live);
+  --color-good:       var(--good);
+  --color-bad:        var(--bad);
+  --color-success:    var(--success);
+  --color-danger:     var(--danger);
+  --color-gold:       var(--gold);
+  --color-silver:     var(--silver);
+  --color-bronze:     var(--bronze);
+
+  /* Typography — Geist (body), Georgia (display/serif), JetBrains Mono */
+  --font-sans:    var(--font-body), system-ui, sans-serif;
+  --font-display: Georgia, "Times New Roman", serif;
+  --font-mono:    var(--font-mono-var), ui-monospace, monospace;
+
+  /* Type scale: 14 · 16 · 20 · 24 · 32 · 48 (landing adds .display) */
+  --text-xs:   14px;
+  --text-base: 16px;
+  --text-lg:   20px;
+  --text-xl:   24px;
+  --text-2xl:  32px;
+  --text-3xl:  48px;
+
+  /* Spacing: 4 · 8 · 12 · 16 · 24 · 32 · 48 · 64 */
+  --spacing-1:   4px;
+  --spacing-2:   8px;
+  --spacing-3:   12px;
+  --spacing-4:   16px;
+  --spacing-6:   24px;
+  --spacing-8:   32px;
+  --spacing-12:  48px;
+  --spacing-16:  64px;
+
+  /* Radius — 0 everywhere, only rounded-full retained for avatars */
+  --radius-none:  0px;
+  --radius:       0px;
+  --radius-full:  9999px;
+
+  /* Max-widths */
+  --container:    min(1160px, 100% - 64px);
+  --shell:        1280px;
+}
+
+/* ============================================================
+   4. BASE STYLES
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 96px;
+  overflow-x: clip;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body, system-ui, sans-serif);
+  font-size: 16px;
+  line-height: 1.5;
+  overflow-wrap: break-word;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Headings — Georgia serif, no rounding on outlines */
+h1, h2, h3, h4 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+p { margin: 0; color: var(--text-muted); max-width: 75ch; }
+
+a {
+  color: var(--link);
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
+}
+a:hover { text-decoration: underline; }
+
+/* Buttons rendered as <a> via asChild must keep their variant colour, not the link colour.
+   data-slot="button" is set on every Button render (button.tsx). */
+a[data-slot="button"],
+a[data-slot="button"]:hover {
+  color: currentColor;   /* let Tailwind text-[] class win */
+  text-decoration: none;
+}
+
+[hidden] { display: none !important; }
+main:focus { outline: none; }
+
+/* Focus ring — 3px teal outline, no border-radius (UI guide: radius 0) */
+:focus-visible {
+  outline: 3px solid var(--focus, var(--brand));
+  outline-offset: 4px;
+}
+
+/* Skip link */
+.skip-link {
+  position: fixed;
+  left: 16px;
+  top: -100px;
+  z-index: 100;
+  background: var(--action);
+  color: var(--on-action);
+  padding: 12px 16px;
+  font-weight: 500;
+}
+.skip-link:focus { top: 16px; }
+
+/* ============================================================
+   5. FORM INPUTS — radius 0, 44px min-height, token colours
+   ============================================================ */
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+input:not([type=checkbox]):not([type=radio]),
+select,
+textarea {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  padding: 12px;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  font-family: inherit;
+  font-size: 16px;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: border-color var(--duration-fast) var(--ease-ui);
+}
+input::placeholder, textarea::placeholder { color: var(--text-muted); opacity: 1; }
+input:focus, select:focus, textarea:focus {
+  outline: 3px solid var(--focus);
+  outline-offset: 0;
+  border-color: var(--brand);
+}
+input[type=checkbox], input[type=radio] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--action);
+  border-radius: 0;
+}
+textarea { resize: vertical; min-height: 120px; }
+input:disabled, select:disabled, textarea:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ============================================================
+   6. LAYOUT UTILITIES
+   ============================================================ */
+.container  { width: min(1160px, 100% - 64px); margin-inline: auto; }
+.shell      { max-width: 1280px; margin-inline: auto; padding-inline: 32px; }
+/* App-shell two-column (sidebar + main) */
+.app-shell  { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 32px; }
+@media (max-width: 800px) { .app-shell { grid-template-columns: 1fr; } }
+
+/* ============================================================
+   7. COMPONENT TOKEN CLASSES
+   ============================================================ */
+
+/* Buttons — radius 0, 44px min-height, token colours */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 16px;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 500;
+  border: 1px solid transparent;
+  border-radius: 0;
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-ui),
+              color var(--duration-fast) var(--ease-ui),
+              border-color var(--duration-fast) var(--ease-ui);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.btn-primary   { background: var(--action); color: var(--on-action); border-color: var(--action); }
+.btn-primary:hover { background: var(--text); color: var(--bg); border-color: var(--text); }
+.btn-secondary { background: transparent; color: var(--text); border-color: var(--border); }
+.btn-secondary:hover { border-color: var(--text); }
+.btn-danger    { background: var(--danger); color: #fff; border-color: var(--danger); }
+.btn-ghost     { background: transparent; color: var(--text-muted); border: none; }
+.btn-ghost:hover { color: var(--text); }
+.btn:disabled  { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+
+/* Cards — transparent bg, 1px border top or all sides, radius 0 */
+.card       { border: 1px solid var(--border); padding: 24px; }
+.card-top   { border: none; border-top: 1px solid var(--border); padding: 24px 0; }
+.card-inner { background: var(--surface); border: 1px solid var(--border); padding: 24px; }
+
+/* Stat blocks (like admin dashboard) */
+.stat { border-bottom: 1px solid var(--border); padding: 24px 0; }
+.stat-val { font-family: Georgia, serif; font-size: 32px; font-weight: 400; color: var(--text); }
+.stat-label { font-size: 14px; color: var(--text-muted); margin-bottom: 8px; }
+
+/* Status pills — left border, no fill */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  border-left: 2px solid currentColor;
+  padding: 0 8px;
+  font-size: 14px;
+  border-radius: 0;
+  background: transparent;
+}
+.pill-open    { color: var(--success); }
+.pill-closed  { color: var(--text-muted); }
+.pill-live    { color: var(--live); }
+.pill-draft   { color: var(--text-muted); }
+
+/* Data table */
+.tbl-wrap { border-top: 1px solid var(--border); padding: 24px 0; }
+table     { width: 100%; border-collapse: collapse; }
+th        { text-align: left; font-size: 14px; font-weight: 500; color: var(--text-muted);
+            padding: 8px 12px; border-bottom: 1px solid var(--border); }
+td        { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; vertical-align: top; }
+.numeric  { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Eyebrow / kicker */
+.eyebrow {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+/* Sidebar navigation (admin/participant shell) */
+.sidebar {
+  border-left: 1px solid var(--border);
+  padding: 0 16px;
+  align-self: start;
+  position: sticky;
+  top: 96px;
+}
+.sidebar a {
+  display: block;
+  padding: 10px 12px;
+  font-size: 14px;
+  color: var(--text-muted);
+  text-decoration: none;
+  border-radius: 0;
+  transition: color var(--duration-fast) var(--ease-ui);
+}
+.sidebar a:hover, .sidebar a.active { color: var(--text); border-left: 2px solid var(--brand); margin-left: -2px; padding-left: 10px; }
+@media (max-width: 800px) { .sidebar { position: static; border-left: none; border-bottom: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 4px; padding: 8px; } }
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 50;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 12px 16px;
+  font-size: 14px;
+  min-width: 240px;
+  max-width: 400px;
+  border-radius: 0;
+}
+
+/* ============================================================
+   8. NUMERIC / SCORE DISPLAYS — tabular-nums required on all scores
+   ============================================================ */
+.tnum,
+.score, .timer, .rank,
+[data-numeric] {
+  font-variant-numeric: tabular-nums;
+}
+.mono {
+  font-family: var(--font-mono-var, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================
+   9. LIVE / TIMER STATES
+   ============================================================ */
+@keyframes pulse-live {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.55; }
+}
+@keyframes rank-flash {
+  from { background: color-mix(in srgb, var(--brand) 20%, transparent); }
+  to   { background: transparent; }
+}
+@keyframes slide-in-up {
+  from { transform: translateY(8px); opacity: 0; }
+  to   { transform: translateY(0);   opacity: 1; }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.animate-pulse-live  { animation: pulse-live 1.4s ease-in-out infinite; }
+.animate-rank-flash  { animation: rank-flash 1.2s var(--ease-ui) forwards; }
+.animate-slide-in    { animation: slide-in-up var(--duration-base) var(--ease-ui) both; }
+.animate-fade-in     { animation: fade-in var(--duration-base) var(--ease-ui) both; }
+.animate-spin        { animation: spin 0.8s linear infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .animate-pulse-live, .animate-rank-flash,
+  .animate-slide-in, .animate-fade-in, .animate-spin {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Live dot (inline, inside pill/badge) */
+.live-dot {
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--live);
+  animation: pulse-live 1.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) { .live-dot { animation: none; } }
+
+/* ============================================================
+   10. SYSTEM STATES
+   ============================================================ */
+/* Loading skeleton: --wash blocks shaped like content */
+.skeleton {
+  background: var(--wash);
+  animation: fade-in 1.2s ease-in-out infinite alternate;
+}
+@media (prefers-reduced-motion: reduce) { .skeleton { animation: none; } }
+
+/* Empty state */
+.empty-state {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 32px;
+  text-align: center; gap: 16px; color: var(--text-muted);
+}
+
+/* ============================================================
+   11. PRINT
+   ============================================================ */
+@media print {
+  header, footer, aside, button, .toast { display: none !important; }
+  body { background: #fff; color: #000; }
+  .container, .shell { width: 100%; padding: 0; }
+  .card { break-inside: avoid; }
+}
+
+/* ============================================================
+   12. SCROLLBAR (subtle, theme-aware)
+   ============================================================ */
+::-webkit-scrollbar         { width: 6px; height: 6px; }
+::-webkit-scrollbar-track   { background: transparent; }
+::-webkit-scrollbar-thumb   { background: var(--border); }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }

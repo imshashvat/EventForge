@@ -1,0 +1,35 @@
+name: Job tick (auto-submit sweeper)
+
+# Triggers POST /api/v1/internal/jobs which self-seeds and runs the sweeper.
+# GitHub cron is best-effort (>= 5 min, may be delayed). Correctness does NOT
+# depend on it: expired attempts are also finalized lazily on the next
+# save/start (R-TIME-04) and by the round-close gate.
+# Requires repo secrets: APP_URL (https://...), CRON_SECRET.
+# Decision pending (TASKS: Vercel cron cadence [U]): move to a 1-minute scheduler
+# before any live event with tight deadlines.
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tick:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Call job tick
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          set -euo pipefail
+          test -n "$APP_URL" && test -n "$CRON_SECRET"
+          code=$(curl -sS -o /tmp/out.json -w "%{http_code}" -X POST \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            --max-time 60 "$APP_URL/api/v1/internal/jobs")
+          cat /tmp/out.json; echo
+          test "$code" = "200"
